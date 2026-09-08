@@ -1,0 +1,14 @@
+services:
+  hercules_runtime:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    healthcheck:
+      # No HTTP control API yet (Phase 2) -- proves Hercules is up AND actually listening for
+      # 3270 connections, not just that the process exists. start_period is generous because a
+      # cold MVS 3.8j IPL (ipl 148 -> IEA101A reply -> JES2/VTAM/TCAS init) takes ~20-30s.
+      test: ["CMD-SHELL", "timeout 2 bash -c 'exec 3<>/dev/tcp/127.0.0.1/3270' || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 45s

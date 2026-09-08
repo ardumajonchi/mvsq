@@ -1,0 +1,9 @@
+name: "MVS-Q"
+description: "A real IBM mainframe in your browser: Hercules emulating a System/370 running MVS 3.8j, with a green-screen 3270 terminal over the web."
+icon: "🖥️"
+ports:
+  - 7000
+bricks:
+  - arduino:web_ui: {}
+  - hercules_runtime: {}
+gh_repo: "ardumajonchi/mvsq"

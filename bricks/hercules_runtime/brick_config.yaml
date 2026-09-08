@@ -1,0 +1,8 @@
+id: hercules_runtime
+name: Hercules Mainframe Runtime (MVS 3.8j)
+description: "Hercules S/370 emulator auto-IPLing the public-domain MVS 3.8j (tk4-) guest OS, exposing a 3270 terminal pool for the app's TSO/JES2 bridge"
+category: emulation
+supported_boards: ["unoq"]
+requires_container: true
+ports:
+  - 3270
