@@ -1,0 +1,168 @@
+/* MVS-Q -- classic green-screen 3270 look: black field, phosphor-green monospace text, a single
+   blinking block cursor positioned in `ch`/line-height units over a <pre> that always holds the
+   Brick's 24x80 screen buffer verbatim (see control_server.py's Ascii action). */
+
+:root {
+  --bg: #050705;
+  --screen-bg: #000f00;
+  --green: #33ff33;
+  --green-dim: #1f9c1f;
+  --amber: #ffb000;
+  --red: #ff4d4d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--green);
+  font-family: "Courier New", Courier, monospace;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 16px;
+  gap: 10px;
+}
+
+#topbar {
+  width: 100%;
+  max-width: 820px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+#topbar h1 {
+  font-size: 18px;
+  letter-spacing: 1px;
+  margin: 0;
+  color: var(--green);
+}
+
+#subtitle {
+  font-size: 12px;
+  color: var(--green-dim);
+  margin-left: 8px;
+}
+
+#status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+#status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 6px var(--red);
+}
+
+#status-dot.online {
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+}
+
+#terminal-wrap {
+  position: relative;
+  background: var(--screen-bg);
+  border: 2px solid #143414;
+  border-radius: 4px;
+  padding: 12px;
+  outline: none;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.6);
+}
+
+#terminal-wrap:focus {
+  border-color: var(--green-dim);
+}
+
+#screen {
+  margin: 0;
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: 0;
+  white-space: pre;
+  color: var(--green);
+  text-shadow: 0 0 4px rgba(51, 255, 51, 0.5);
+}
+
+#cursor {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 1ch;
+  height: 20px;
+  background: var(--green);
+  opacity: 0.6;
+  mix-blend-mode: difference;
+  animation: blink 1s steps(1) infinite;
+  pointer-events: none;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 0.6; }
+  50.01%, 100% { opacity: 0; }
+}
+
+#terminal-hint {
+  font-size: 11px;
+  color: var(--green-dim);
+  max-width: 820px;
+  text-align: center;
+}
+
+#keybar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 820px;
+}
+
+.key-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.key {
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--green);
+  background: #0d1f0d;
+  border: 1px solid var(--green-dim);
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: transform 0.05s;
+}
+
+.key:hover {
+  background: #163216;
+}
+
+.key:active {
+  transform: translateY(1px);
+}
+
+.key-enter {
+  background: #163a16;
+  border-color: var(--green);
+  font-weight: bold;
+}
+
+.pf-row .key {
+  min-width: 44px;
+  font-size: 11px;
+}

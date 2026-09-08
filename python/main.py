@@ -48,24 +48,37 @@ def main():
     state_lock = threading.Lock()
     last_state: dict = {}
 
-    def broadcast_if_changed(state: dict) -> None:
+    def broadcast(state: dict) -> None:
+        """Unconditional broadcast -- used for the poll loop's own change-check (below) and for
+        anything that must reach a client regardless of whether the state changed, e.g. a client
+        that just connected and has never seen a "state" event at all."""
         nonlocal last_state
+        with state_lock:
+            last_state = state
+        ui.send_message("state", state)
+
+    def broadcast_if_changed(state: dict) -> None:
         with state_lock:
             if state == last_state:
                 return
-            last_state = state
-        ui.send_message("state", state)
+        broadcast(state)
 
     def _poll_loop() -> None:
         while True:
             broadcast_if_changed(mainframe.screen())
             time.sleep(_POLL_SECONDS)
 
+    key_lock = threading.Lock()
+
     def _on_key(sid, data):
-        broadcast_if_changed(mainframe.send_key(data or {}))
+        # Browser sends one socket message per keystroke; without this lock, concurrent
+        # dispatch of rapid-fire "key" events can let their HTTP round-trips to the Brick
+        # complete out of order and scramble typed text (observed: "cul8tr" -> "tcu8r").
+        with key_lock:
+            broadcast(mainframe.send_key(data or {}))
 
     def _on_connect(sid):
-        broadcast_if_changed(mainframe.screen())
+        broadcast(mainframe.screen())
 
     ui.on_connect(_on_connect)
     ui.on_message("key", _on_key)

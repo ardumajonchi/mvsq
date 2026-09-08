@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MVS-Q</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header id="topbar">
+      <h1>MVS-Q <span id="subtitle">S/370 &middot; MVS 3.8j</span></h1>
+      <div id="status"><span id="status-dot"></span><span id="status-text">connecting&hellip;</span></div>
+    </header>
+
+    <div id="terminal-wrap" tabindex="0">
+      <pre id="screen"></pre>
+      <div id="cursor"></div>
+    </div>
+    <div id="terminal-hint">Click the screen, then type. Real keyboard: Enter, Tab, Shift+Tab, F1&ndash;F12 (PF1&ndash;12), Shift+F1&ndash;F12 (PF13&ndash;24).</div>
+
+    <div id="keybar">
+      <div class="key-row">
+        <button class="key" id="clear-btn">Clear</button>
+        <button class="key" id="backtab-btn">&larr; Tab</button>
+        <button class="key" id="tab-btn">Tab &rarr;</button>
+        <button class="key key-enter" id="enter-btn">Enter</button>
+      </div>
+      <div class="key-row pf-row" id="pf-row-1"></div>
+      <div class="key-row pf-row" id="pf-row-2"></div>
+    </div>
+  </div>
+
+  <script src="socket.io.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
