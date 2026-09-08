@@ -6,3 +6,4 @@ supported_boards: ["unoq"]
 requires_container: true
 ports:
   - 3270
+  - 3271
