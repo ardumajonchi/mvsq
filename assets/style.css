@@ -175,3 +175,11 @@ html, body {
   min-width: 44px;
   font-size: 11px;
 }
+
+#credits {
+  font-size: 10px;
+  color: var(--green-dim);
+  opacity: 0.7;
+  text-align: center;
+  margin-top: 4px;
+}
