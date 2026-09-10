@@ -96,6 +96,36 @@ VTAM/TSO terminal sessions — this is what `control_server.py`'s `s3270` subpro
 now — every browser tab drives the same terminal, not one each from the 8-deep pool (see
 `python/main.py`'s docstring for why that's a deliberate MVP simplification).
 
+## Recovering a wedged keyboard or a wedged s3270 subprocess
+
+Two distinct failure modes found live, both now handled without requiring a container restart:
+
+- **A wedged s3270 subprocess** (e.g. Hercules stops responding mid-action) used to block
+  `Mainframe._run_action()`'s `readline()` forever, holding the shared lock and hanging every
+  future request indefinitely — including `/healthz` itself, which should always return promptly
+  (200 or 503), never hang. Fixed with a `select()`-based read timeout, but **only on the first
+  line of each action's response**: s3270's protocol is strictly one-action-in/one-block-out, so
+  the read buffer is guaranteed empty when a new action starts, making a timeout on that first
+  read sound. Guarding every line, not just the first, was tried and reverted — Python's buffered
+  `TextIOWrapper` can pull an entire multi-line response (e.g. `Ascii`'s full-screen dump) into its
+  internal buffer from one OS-level read, so `select()` on the raw fd falsely reports "not ready"
+  for the later lines even though `readline()` would return them instantly, causing a reconnect
+  storm (endless kill+respawn+reconnect, visible as repeating `HHCTE007I`/`HHCTE009I` connect/
+  disconnect pairs in Hercules's own console log) that never let the container reach healthy.
+- **A locked keyboard** (the s3270 status line's `L` field), left behind by a benign
+  operator-error condition (e.g. TSO's `IKJ56429A REENTER` prompt) — every subsequent action was
+  rejected forever, with no way to clear it short of a full container restart. Fixed by adding
+  `press_reset()` (`Reset()`, the correct 3270 action for exactly this — distinct from `Clear()`,
+  which sends the CLEAR AID to the host and doesn't touch a purely local lock condition) and
+  wiring it through `POST /key {"reset": true}`.
+
+`entrypoint.sh` also launches `control_server.py` with `python3 -u` (unbuffered stdout) — without
+it, none of this module's own diagnostic `print()`s (including the ones that explain *why*
+`connect()`/`act()` failed) ever reached `docker logs`, since stdout is fully block-buffered by
+default when piped through a shell into Docker's log driver rather than attached to a TTY. This
+directly hampered diagnosing the reconnect storm above: grepping logs for its own print-statement
+prefix found nothing despite the loop clearly failing.
+
 ## Degradation
 
 If this container is missing, still booting, or a `/screen`/`/key` request times out/errors,

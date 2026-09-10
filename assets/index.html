@@ -16,7 +16,7 @@
       <pre id="screen"></pre>
       <div id="cursor"></div>
     </div>
-    <div id="terminal-hint">Click the screen, then type. Real keyboard: Enter, Tab, Shift+Tab, F1&ndash;F12 (PF1&ndash;12), Shift+F1&ndash;F12 (PF13&ndash;24).</div>
+    <div id="terminal-hint">Click the screen, then type. Real keyboard: Enter, Tab, Shift+Tab, arrow keys, F1&ndash;F12 (PF1&ndash;12), Shift+F1&ndash;F12 (PF13&ndash;24).</div>
 
     <div id="keybar">
       <div class="key-row">
@@ -24,6 +24,13 @@
         <button class="key" id="backtab-btn">&larr; Tab</button>
         <button class="key" id="tab-btn">Tab &rarr;</button>
         <button class="key key-enter" id="enter-btn">Enter</button>
+        <button class="key key-reset" id="reset-btn" title="Clears a locked keyboard without restarting the session">Reset</button>
+      </div>
+      <div class="key-row">
+        <button class="key" id="up-btn">&uarr;</button>
+        <button class="key" id="down-btn">&darr;</button>
+        <button class="key" id="left-btn">&larr;</button>
+        <button class="key" id="right-btn">&rarr;</button>
       </div>
       <div class="key-row pf-row" id="pf-row-1"></div>
       <div class="key-row pf-row" id="pf-row-2"></div>

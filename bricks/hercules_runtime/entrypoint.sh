@@ -13,5 +13,10 @@
 # down too, rather than leaving a zombie API up with no mainframe behind it.
 set -e
 cd /opt
-python3 control_server.py &
+# -u: control_server.py runs backgrounded and piped through this shell into Docker's log driver,
+# not a TTY -- Python's default stdout buffering in that case is fully block-buffered, so its
+# own error prints (e.g. Mainframe.connect() failures) sat invisible in-buffer for the entire
+# container lifetime instead of reaching `docker logs`, which is exactly what happened while
+# diagnosing a real reconnect-storm bug live.
+python3 -u control_server.py &
 exec hercules -f conf/tk4-.cnf

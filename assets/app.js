@@ -47,6 +47,10 @@ function queueText(ch) {
 function sendControl(payload) {
   flushPendingText();
   sendKey(payload);
+  // Re-focus the terminal after every control action -- otherwise clicking an on-screen key
+  // button (Enter/Tab/PF/arrows) leaves DOM focus on that <button>, and subsequent real
+  // keystrokes are swallowed by the browser before they ever reach onTerminalKeydown.
+  document.getElementById("terminal-wrap").focus();
 }
 
 function blankScreen() {
@@ -106,6 +110,12 @@ function onTerminalKeydown(evt) {
     sendControl({ pf: n });
     return;
   }
+  const arrowKey = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right" }[evt.key];
+  if (arrowKey) {
+    evt.preventDefault();
+    sendControl({ [arrowKey]: true });
+    return;
+  }
   if (isPrintable(evt.key)) {
     evt.preventDefault();
     queueText(evt.key);
@@ -125,6 +135,11 @@ function setupKeybar() {
   document.getElementById("tab-btn").addEventListener("click", () => sendControl({ tab: true }));
   document.getElementById("backtab-btn").addEventListener("click", () => sendControl({ backtab: true }));
   document.getElementById("clear-btn").addEventListener("click", () => sendControl({ clear: true }));
+  document.getElementById("reset-btn").addEventListener("click", () => sendControl({ reset: true }));
+  document.getElementById("up-btn").addEventListener("click", () => sendControl({ up: true }));
+  document.getElementById("down-btn").addEventListener("click", () => sendControl({ down: true }));
+  document.getElementById("left-btn").addEventListener("click", () => sendControl({ left: true }));
+  document.getElementById("right-btn").addEventListener("click", () => sendControl({ right: true }));
 
   const row1 = document.getElementById("pf-row-1");
   const row2 = document.getElementById("pf-row-2");

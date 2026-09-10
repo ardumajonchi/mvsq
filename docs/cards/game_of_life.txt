@@ -1,0 +1,57 @@
+MVS-Q -- example session card
+Title: Conway's Game of Life on a real green screen
+
+WHAT IT DOES
+TK4-'s TSO library ships LIFE, a full-screen Conway's Game of Life you play directly on the
+3270 terminal -- you draw a starting pattern with the cursor, then hand it to MVS to compute
+the next generation. It's one of the few interactive (not batch) programs on this system, and
+it switches the terminal into its 43-row "alternate screen" mode for the duration, which is
+itself worth seeing: the same live green-screen terminal, briefly showing almost twice as much
+of MVS's screen buffer as the normal 24-row TSO session.
+
+HOW TO RUN IT
+  1. Logon: type "logon herc01", press Enter, then type the password "cul8tr" and press Enter.
+  2. Press Enter once or twice more to clear the welcome banner and MOTD -- you'll land on the
+     "TSO Applications" menu. Press PF3 to terminate it back to READY (or just type "life" and
+     press Enter directly from the menu's Option line -- either path works).
+  3. At READY, type "life" and press Enter.
+  4. A title-card splash appears (block letters spelling out "LIFE"). Press Enter (or any key)
+     to go to the input screen, per its own on-screen instructions.
+  5. You're now looking at a blank 43x80 grid with the cursor at the top-left corner. Use the
+     arrow keys (real keyboard arrows, or the on-screen up/down/left/right buttons) to move the
+     cursor, and type any character to mark a live cell at that position.
+  6. Draw a glider -- a small self-propelling pattern -- by placing 5 cells in this shape
+     (starting from the top-left corner, row/col offsets from your first cell):
+         .X.
+         ..X
+         XXX
+     i.e. one cell, then move down+right one and place a second, then move down one and left
+     two and place three cells in a row.
+  7. Press Enter to hand your pattern to MVS -- this submits the generation for computation,
+     per LIFE's own on-screen prompt ("HIT ANY OTHER KEY TO GO DIRECTLY TO THE INPUT SCREEN FOR
+     THE FIRST GENERATION").
+
+WHAT TO EXPECT
+This is a genuine, decades-old piece of community TSO software running under emulation, not a
+guaranteed animation -- what MVS computes and redraws depends on this specific TK4- build's own
+LIFE logic, which may differ subtly from the standard Game of Life rules you'd expect from a
+glider (edge handling near the screen boundary, for instance, is this program's own choice, not
+something MVS-Q controls). Treat it as "watch a 1970s-style mainframe compute a cellular
+automaton you fed it live," not as a guaranteed glider flythrough -- the interesting part is
+that you're really drawing on, and MVS is really computing, the pattern.
+
+IF THE KEYBOARD LOCKS UP
+An occasional benign operator-error condition (e.g. a mistyped field during logon) can leave the
+3270 keyboard locally locked -- typed input stops reaching the screen entirely. This isn't a
+crash; click the amber "Reset" button in the key bar (or send {"reset": true}) to clear the lock
+without losing your session or restarting the container.
+
+HOW IT WORKS
+Conway's Game of Life is a cellular automaton: each cell on the grid is alive or dead, and every
+generation, a cell's next state depends only on how many of its 8 neighbors are currently alive
+(too few or too many neighbors and it dies; the right number and a dead cell is born). A
+"glider" is the simplest pattern that translates diagonally across the grid forever under the
+standard rules, which is why it's the traditional first pattern to try. Here, the drawing and
+computation happen inside the same TSO session driving Hercules's emulated 3270 device -- the
+`hercules_runtime` Brick's control API (`control_server.py`) just forwards your arrow-key moves
+and keystrokes to the live 3270 buffer via s3270, exactly like every other MVS-Q interaction.

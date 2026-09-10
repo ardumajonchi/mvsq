@@ -162,6 +162,15 @@ html, body {
   font-weight: bold;
 }
 
+.key-reset {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.key-reset:hover {
+  background: #2a1f0d;
+}
+
 .pf-row .key {
   min-width: 44px;
   font-size: 11px;
